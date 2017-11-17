@@ -1,51 +1,41 @@
 const express = require("express");
 const Quote = require("./models/quote.js");
+const authorRoutes = require("./routes/authorRoutes.js");
+const quoteRoutes = require("./routes/quoteRoutes.js");
 const app = express();
 const middleware = require("./middleware.js");
 
 middleware(app);
 
-app.get("/", async (req, res) => {
-    try{
-        res.status(200).json({message: "hi"});
-    }catch(e){
-        console.log(e);
-    }
+app.use("/author", authorRoutes);
+app.use("/quotes", quoteRoutes);
+app.get("/", wrapAsync(async (req, res) => {        
+    res.status(200).json({
+            route: "/",
+            message: "Welcome to my quotes service.",
+            routes: "Routes available are /author and /quotes"
+    });    
+}));
+
+app.get("*", wrapAsync(async (req, res, next) => {    
+    res.status(404).json({
+        route: "notfound",
+        message: "This route doesn't exist"
+    });
+}));
+
+app.use((err, req, res, next) => {    
+        console.log("error handler")
+        res.json({
+            message: "Something went wrong.", 
+            error: err.message
+        });    
 });
 
-app.get("/quotes", async(req, res) => {
-    try{
-        res.status(200).json({
-            text: "quote 1",
-            author: "random author"
-        });
-    }catch(e){
-        console.log(e);
-    }
-});
-
-app.post("/quotes", async(req, res) => {
-    try{
-        const text = req.body.text;
-        const author = req.body.author;
-        const latestQuote = new Quote({
-            text: text,
-            author: author
-        });        
-        latestQuote.save((err, data) => {
-            if(err){
-                console.log(err);
-            }else{
-                console.log(latestQuote);
-                res.status(200).json({message: "success", details: data});
-            }
-        });
-    }catch(e){
-
-    }
-});
-
-
-
+function wrapAsync(fn){
+    return function(req, res, next){
+        fn(req, res, next).catch(next);
+    };
+}
 
 module.exports = app;
