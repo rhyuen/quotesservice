@@ -1,37 +1,32 @@
 const express = require("express");
 const Quote = require("../models/quote.js");
+const wrapAsync = require("../common/util.js");
 const router = express.Router();
 
-router.get("/", async(req, res) => {
-    try{                
-        const variable = await req.query.author;
-        const search = variable ? {author: variable} : {};
-        const data = await Quote.find(search);        
-        const quoteCount = await Quote.count(search);
-        await res.status(200).json({data, count: quoteCount});
-    }catch(e){
-        console.log(e);
-    }
-});
+router.get("/", wrapAsync(async(req, res) => {    
+    const variable = await req.query.author;
+    const search = variable ? {author: variable} : {};
+    const data = await Quote.find(search);        
+    const quoteCount = await Quote.count(search);
+    res.status(200).json({
+        data, 
+        count: quoteCount
+    });    
+}));
 
-router.post("/", async(req, res) => {
-    try{
-        const text = req.body.text;
-        const author = req.body.author;
-        const latestQuote = new Quote({
-            text: text,
-            author: author
-        });        
-        latestQuote.save().then(data => {
-            console.log(latestQuote);
-            res.status(200).json({message: "success", details: data});
-        }).catch(e => {
-            console.log(e);
-        });      
-    }catch(e){
-        console.log(e);
-    }
-});
+router.post("/", wrapAsync(async(req, res) => {    
+    const text = req.body.text;
+    const author = req.body.author;
+    const latestQuote = new Quote({
+        text: text,
+        author: author
+    });        
+    const data = await latestQuote.save()
+    res.status(201).json({
+        message: "Success, new Quote added.", 
+        details: data
+    });    
+}));
 
 
 module.exports = router;
