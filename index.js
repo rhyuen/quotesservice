@@ -1,10 +1,11 @@
 const mongoose = require("mongoose");
 const server = require("./server.js");
-const PORT = process.env.NODE_ENV || 9934;
+const PORT = process.env.PORT || 9934;
 
 process.on("uncaughtException", async (err) => {
     try{      
         console.log("uncaughtexception");
+        console.log(err);
     }catch(e){
     }
 });

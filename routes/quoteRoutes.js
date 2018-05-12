@@ -9,24 +9,35 @@ router.get("/", wrapAsync(async(req, res) => {
     const data = await Quote.find(search);        
     const quoteCount = await Quote.count(search);
     res.status(200).json({
-        data, 
-        count: quoteCount
+        path: "/quotes/",
+        date: new Date(),
+        message: "GET Request on /quotes/",
+        count: quoteCount,
+        data
     });    
 }));
 
-router.post("/", wrapAsync(async(req, res) => {    
-    const text = req.body.text;
-    const author = req.body.author;
-    const latestQuote = new Quote({
-        text: text,
-        author: author
-    });        
-    const data = await latestQuote.save()
-    res.status(201).json({
-        message: "Success, new Quote added.", 
-        details: data
-    });    
-}));
+if(process.env.NODE_ENV === "dev"){
+    console.log("POSTS enabled in dev")
+    router.post("/", wrapAsync(async(req, res) => {    
+        const text = req.body.text;
+        const author = req.body.author;
+        const latestQuote = new Quote({
+            text: text,
+            author: author
+        });        
+        const data = await latestQuote.save()
+        res.status(201).json({
+            path: "/quotes/",
+            date: new Date(),
+            message: "Success, new Quote added.", 
+            details: data
+        });    
+    }));
+}else{
+    console.log("POSTS disabled in prod.");
+}
+
 
 
 module.exports = router;

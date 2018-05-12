@@ -33,7 +33,8 @@ async function useAuthService(req, res, next){
     next();    
 }
 
-app.use(wrapAsync(useAuthService));
+//disabling auth for now.
+//app.use(wrapAsync(useAuthService));
 
 app.use("/author", authorRoutes);
 app.use("/quotes", quoteRoutes);
@@ -44,6 +45,10 @@ app.get("/", wrapAsync(async (req, res) => {
             routes: "Routes available are /author and /quotes"
     });    
 }));
+
+
+
+
 
 app.get("*", wrapAsync(async (req, res, next) => {    
     res.status(404).json({
