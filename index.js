@@ -1,17 +1,15 @@
-const mongoose = require("mongoose");
 const server = require("./server.js");
+const winston = require("winston"); 
 const PORT = process.env.PORT || 9934;
 
-process.on("uncaughtException", async (err) => {
-    try{      
-        console.log("uncaughtexception");
-        console.log(err);
-    }catch(e){
-    }
+process.on("uncaughtException", (err) => {  
+    winston.log("error", `Uncaught Exception: ${err}`);    
+    process.exit(1);    
 });
 
 process.on("uncaughtRejection", async (err, promise) => {
-    console.log(err);
+    winston.log("error", `Uncaught Rejection: ${err}`);    
+    process.exit(1);
 });
 
 server.listen(PORT, async (err) => {

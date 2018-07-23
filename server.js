@@ -10,20 +10,22 @@ const middleware = require("./middleware.js");
 middleware(app);
 
 async function useAuthService(req, res, next){
-    if(!req.headers.authorization){
+    if(!req.headers.authorization && !req.cookies["authservice_token"]){
+        console.log("No authorization header or no req.cookies['authservice_token'] %s", req.cookies['authservice_token']);        
+
         //TODO: if client is api, send error message
         //TODO: if client is browser, redirect.
-        return res.redirect("http://localhost:5789/login");
-    }
-    
+        return res.redirect("http://localhost:7690/login");
+    }    
+    const authTokenForHeader = req.cookies["authservice_token"] || req.headers.authorization;
+    console.log("token: " + authTokenForHeader);
     const options = {
         method: "GET",
-        headers: {"Authorization": `${req.headers.authorization}`}        
+        headers: {"Authorization": `Bearer ${authTokenForHeader}`}        
     };
     
      const authRes = await fetch("http://localhost:5789/auth", options);
-     console.log(authRes.url);
-     console.log(authRes.status);               
+     console.log("Result Status: %s | Result redirected from %s", authRes.status, authRes.url);
      
      if(authRes.status === 400 || authRes.status === 401){
         const error = new Error("Credentials are not valid for access to this resource.");
@@ -34,7 +36,7 @@ async function useAuthService(req, res, next){
 }
 
 //disabling auth for now.
-//app.use(wrapAsync(useAuthService));
+app.use(wrapAsync(useAuthService));
 
 app.use("/author", authorRoutes);
 app.use("/quotes", quoteRoutes);
@@ -45,10 +47,6 @@ app.get("/", wrapAsync(async (req, res) => {
             routes: "Routes available are /author and /quotes"
     });    
 }));
-
-
-
-
 
 app.get("*", wrapAsync(async (req, res, next) => {    
     res.status(404).json({

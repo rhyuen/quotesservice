@@ -1,0 +1,14 @@
+{
+    "name": "ryquotes",
+    "alias": [
+        "ryquotes"
+    ],
+    "env": {
+        
+    },
+    "engines": {
+        "node": "^10"
+    },
+    "publie": true,
+    "type": "npm"
+}
