@@ -15,7 +15,7 @@ async function useAuthService(req, res, next){
 
         //TODO: if client is api, send error message
         //TODO: if client is browser, redirect.
-        return res.redirect("http://localhost:7690/login");
+        return res.redirect("http://localhost:5789/login");
     }    
     const authTokenForHeader = req.cookies["authservice_token"] || req.headers.authorization;
     console.log("token: " + authTokenForHeader);
@@ -57,8 +57,9 @@ app.get("*", wrapAsync(async (req, res, next) => {
 
 app.use((err, req, res, next) => {    
     console.log("Quotes Service Error Handler");
-    res.json({
+    res.status(500).json({
         message: "Something went wrong.", 
+        date: new Date().toLocaleString(),
         error: err.message,
         code: err.httpStatusCode
     });    
