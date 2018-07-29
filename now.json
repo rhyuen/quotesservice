@@ -4,7 +4,9 @@
         "ryquotes"
     ],
     "env": {
-        
+        "db": "@quotes_db",
+        "jwtSecret": "@jwt_secret",
+        "cookieSecret": "@cookie_secret"
     },
     "engines": {
         "node": "^10"

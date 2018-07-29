@@ -3,7 +3,7 @@ const winston = require("winston");
 const PORT = process.env.PORT || 9934;
 
 process.on("uncaughtException", (err) => {  
-    winston.log("error", `Uncaught Exception: ${err}`);    
+    winston.log("error", `Uncaught Exception: ${err}`); 
     process.exit(1);    
 });
 
@@ -13,9 +13,9 @@ process.on("uncaughtRejection", async (err, promise) => {
 });
 
 server.listen(PORT, async (err) => {
-    try{
-        console.log(`Quotes Service: PORT ${PORT}`);
-    }catch(e){
-        console.log(err);
+    if(err){
+        return console.log(err);        
     }
+    console.log(`Quotes Service: PORT ${PORT}`);
+    
 });
