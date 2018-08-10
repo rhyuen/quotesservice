@@ -18,7 +18,7 @@ exports.extServices = () => {
     };
 
     const prodSvcURLS = {
-        auth: "ryauth.now.sh",
+        auth: "ryauth-alone.now.sh",
         quotes: "ryquotes.now.sh",
         opendata: "",
         words: "rywords.now.sh"

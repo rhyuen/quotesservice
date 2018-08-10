@@ -1,8 +1,6 @@
 {
     "name": "ryquotes",
-    "alias": [
-        "ryquotes"
-    ],
+    "alias": "ryquotes",
     "env": {
         "db": "@quotes_db",
         "jwtSecret": "@jwt_secret",
@@ -11,6 +9,6 @@
     "engines": {
         "node": "^10"
     },
-    "publie": true,
+    "public": true,
     "type": "npm"
 }

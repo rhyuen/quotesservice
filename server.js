@@ -52,25 +52,28 @@ async function isTokenAuthedToRscStandAlone(req, res, next){
             });                       
         console.log(validationResult);
         return next(); 
-    }catch(e){
-        console.log("There was an AuthZ Error\n %s", e);
-        if(e.name === "JsonWebTokenError"){
+    }catch(e){        
+        if(process.env.NODE_ENV !== "prod"){
+            if(e.name === "JsonWebTokenError"){
+                return res.status(401).json({
+                    message: "Wrong signature for your token.",
+                    error: e
+                });
+            }
+            if(e.name === "TokenExpiredError"){
+                return res.status(401).json({
+                    message: "You need to sign in. Your token is expired.",
+                    error: e
+                });
+            }                                         
             return res.status(401).json({
-                message: "Wrong signature for your token.",
+                message: "An unexpected case for your auth happened.",
                 error: e
             });
+        }else{
+            res.redirect("/login");
         }
-        if(e.name === "TokenExpiredError"){
-            return res.status(401).json({
-                message: "You need to sign in. Your token is expired.",
-                error: e
-            });
-        }                                         
-        return res.status(401).json({
-            message: "An unexpected case for your auth happened.",
-            error: e
-        });
-    }    
+    }
 }
 
 // //AuthZ using AuthProxy Service
@@ -102,7 +105,7 @@ app.use((err, req, res, next) => {
         date: new Date().toLocaleString(),
         error: err.message,
         code: err.httpStatusCode
-    });    
+    });
 });
 
 module.exports = app;
