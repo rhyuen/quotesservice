@@ -1,23 +1,23 @@
 const bodyParser = require("body-parser");
-const logger = require("morgan");
+const morgan = require("morgan");
+const logger = require("./logger.js");
 const mongoose = require("mongoose");
 const cookieParser = require("cookie-parser");
-const config = require("./config.js");
-//const winston = require("winston");
+const config = require("../config.js");
 
-module.exports = (app) => {
-    //winston.add(winston.transports.File, {filename: "my_error_log.log"});    
+module.exports = (app) => {    
     app.use(bodyParser.json());
     app.use(bodyParser.urlencoded({extended: false}));
     app.use(cookieParser(config.secrets().cookieSecret, {
         httpOnly: true,
         maxAge: 3600
     }));
-    app.use(logger("dev")); 
-    mongoose.connection.openUri(config.secrets().db)
-        .once("open",  () => {
+    app.use(morgan("dev")); 
+    mongoose.connection.openUri(config.secrets().db, {useNewUrlParser: true})
+        .once("open",  () => {                        
             console.log("db conn attempted");
         }).on("error", e => {
+            logger.error(e);
             console.log("err");
         });
 };

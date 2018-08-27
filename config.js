@@ -25,7 +25,7 @@ exports.extServices = () => {
     };    
     console.log("ext services: " + process.env.NODE_ENV);
     return process.env.NODE_ENV === "dev" ? devSvcURLS : prodSvcURLS;
-} 
+};
 
 exports.secrets = () => {
     const envTypes = ["dev", "prod", "test"];
@@ -40,5 +40,5 @@ exports.secrets = () => {
         "jwtSecret": process.env.jwtSecret || nconf.get(`${currentEnv}:jwtSecret`),
         "cookieSecret": process.env.cookieSecret || nconf.get(`${currentEnv}:cookieSecret`)
     };  
-}
+};
 

@@ -2,14 +2,16 @@ const express = require("express");
 const fetch = require("node-fetch");
 const {promisify} = require("util");
 const jwt = require("jsonwebtoken");
-const jwtVerify = promisify(jwt.verify);
 const Quote = require("./models/quote.js");
+const wrapAsync = require("./common/util.js");
+const middleware = require("./common/middleware.js");
+const logger = require("./common/logger.js");
 const authorRoutes = require("./routes/authorRoutes.js");
 const quoteRoutes = require("./routes/quoteRoutes.js");
 const {extServices, secrets} = require("./config.js");
+
 const app = express();
-const wrapAsync = require("./common/util.js");
-const middleware = require("./middleware.js");
+const jwtVerify = promisify(jwt.verify);
 
 middleware(app);
 
@@ -17,7 +19,7 @@ async function useAuthService(req, res, next){
     if(!req.headers.authorization && !req.cookies["authservice_token"]){
         console.log("No authorization header or no req.cookies['authservice_token']");        
         //TODO: if client is browser, redirect. TODO: if client is api, send error message
-        return res.redirect(`${extServices().auth}/login`);
+        return res.status(302).redirect(`${extServices().auth}/login`);
     }    
     const authTokenForHeader = req.cookies["authservice_token"] || req.headers.authorization;    
     const options = {
@@ -76,10 +78,10 @@ async function isTokenAuthedToRscStandAlone(req, res, next){
     }
 }
 
-// //AuthZ using AuthProxy Service
-// app.use(wrapAsync(useAuthService));
+//AuthZ using AuthProxy Service
+//app.use(wrapAsync(useAuthService));
 //AuthZ using Indep Service
-app.use(wrapAsync(isTokenAuthedToRscStandAlone));
+//app.use(wrapAsync(isTokenAuthedToRscStandAlone));
 
 app.use("/author", authorRoutes);
 app.use("/quotes", quoteRoutes);
@@ -98,8 +100,8 @@ app.get("*", wrapAsync(async (req, res, next) => {
     });
 }));
 
-app.use((err, req, res, next) => {    
-    console.log("Quotes Service Error Handler");
+app.use((err, req, res, next) => {  
+    logger.error(`Application level Error Handler. ${err}`);
     res.status(500).json({
         message: "Something went wrong.", 
         date: new Date().toLocaleString(),
